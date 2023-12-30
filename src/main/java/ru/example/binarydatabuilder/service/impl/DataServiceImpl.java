@@ -2,6 +2,8 @@ package ru.example.binarydatabuilder.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.example.binarydatabuilder.entity.DataTable;
+import ru.example.binarydatabuilder.repository.DataTableRepository;
 import ru.example.binarydatabuilder.service.DataService;
 
 import java.io.ByteArrayOutputStream;
@@ -15,6 +17,8 @@ import java.nio.charset.Charset;
 public class DataServiceImpl implements DataService {
     public static final String FILE_PATH = "C:\\Aleksandr\\Binary-Data-Builder\\src\\main\\resources\\DJAMBO.580";
 
+    private final DataTableRepository dataTableRepository;
+
     @Override
     public String convertStringToHexCode(String data) {
         byte[] bytes = data.getBytes(Charset.forName("CP866"));
@@ -22,6 +26,7 @@ public class DataServiceImpl implements DataService {
         for (byte b : bytes) {
             sb.append(Integer.toHexString(b & 0xFF)).append(" ");
         }
+        dataTableRepository.save(new DataTable());
         return sb.toString();
     }
 
