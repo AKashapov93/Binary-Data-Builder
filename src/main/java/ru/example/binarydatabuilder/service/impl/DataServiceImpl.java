@@ -15,6 +15,7 @@ import java.nio.charset.Charset;
 @Service
 @RequiredArgsConstructor
 public class DataServiceImpl implements DataService {
+    public static final String FILE_PATH = "C:\\Aleksandr\\Binary-Data-Builder\\src\\main\\resources\\DJAMBO.580";
 
     private final DataTableRepository dataTableRepository;
 
@@ -30,17 +31,21 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public byte[] readHexFile(String filePath) throws IOException {
-        try (FileInputStream fileInputStream = new FileInputStream(filePath)) {
+    public byte[] readHexFile()  {
+        try (FileInputStream fileInputStream = new FileInputStream(FILE_PATH)) {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
             int bytesRead;
+
 
             while ((bytesRead = fileInputStream.read(buffer)) != -1) {
                 byteArrayOutputStream.write(buffer, 0, bytesRead);
             }
 
             return byteArrayOutputStream.toByteArray();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
