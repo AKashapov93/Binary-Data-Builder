@@ -18,8 +18,10 @@ public class DataController {
 
     @PostMapping("/data")
     public ResponseEntity<String> acceptData(@RequestBody DataRequest dataRequest) {
-        return ResponseEntity.ok(dataService.convertStringToHexCode(dataRequest.name()));
+        dataService.createTableAndWriteToFile(dataRequest);
+        return ResponseEntity.ok("Success");
     }
+
     @GetMapping("/data")
     public ResponseEntity<Void> printFile() {
         dataService.printHexDump(dataService.readHexFile());

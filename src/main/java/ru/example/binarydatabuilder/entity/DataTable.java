@@ -6,23 +6,25 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import static ru.example.binarydatabuilder.utils.Constant.RED_COLOR;
 
 @Entity
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "data_table")
 @ToString
 public class DataTable {
 
     private static long counter = 0;
-    private static boolean initFlag = false;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,12 +37,22 @@ public class DataTable {
     @Column(name = "command")
     private String command;
 
-    public DataTable() {
-        if (initFlag) {
-            this.address = generateHexValue();
-            this.command = RED_COLOR;
-        }
-        initFlag = true;
+    @Setter(AccessLevel.NONE)
+    @Column(name = "marker")
+    private String marker;
+
+    @Column(name = "mnemonic_and_operand")
+    private String mnemonicAndOperand;
+
+    @Column(name = "comment")
+    private String comment;
+
+    public DataTable(String command, String mnemonicAndOperand, String comment) {
+        this.command = command;
+        this.mnemonicAndOperand = mnemonicAndOperand;
+        this.comment = comment;
+        this.marker = null;
+        this.address = generateHexValue();
     }
 
     private String generateHexValue() {

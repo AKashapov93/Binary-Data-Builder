@@ -5,6 +5,5 @@ spring:
     password: ${DATASOURCE_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
 
-  jpa:
-    hibernate:
-      ddl-auto: update
+  liquibase:
+    change-log: "db.changelog/db.changelog.yml"
