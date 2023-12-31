@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.example.binarydatabuilder.dto.DataRequest;
 import ru.example.binarydatabuilder.service.DataService;
 
+import java.io.IOException;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -17,7 +19,7 @@ public class DataController {
     private final DataService dataService;
 
     @PostMapping("/data")
-    public ResponseEntity<String> acceptData(@RequestBody DataRequest dataRequest) {
+    public ResponseEntity<String> acceptData(@RequestBody DataRequest dataRequest) throws IOException {
         dataService.createTableAndWriteToFile(dataRequest);
         return ResponseEntity.ok("Success");
     }

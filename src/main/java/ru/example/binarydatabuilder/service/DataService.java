@@ -6,7 +6,7 @@ import java.io.IOException;
 
 public interface DataService {
 
-    void createTableAndWriteToFile(DataRequest dataRequest);
+    void createTableAndWriteToFile(DataRequest dataRequest) throws IOException;
 
     String convertStringToHexCode(String data);
 
@@ -16,5 +16,5 @@ public interface DataService {
 
     void editHexValue(byte[] data, String newValueHex);
 
-    void saveHexFile(String filePath, byte[] data) throws IOException;
+    void saveHexFile(byte[] data) throws IOException;
 }
