@@ -1,12 +1,16 @@
 package ru.example.binarydatabuilder.service;
 
+import ru.example.binarydatabuilder.dto.DataRequest;
+
 import java.io.IOException;
 
 public interface DataService {
 
+    void createTableAndWriteToFile(DataRequest dataRequest);
+
     String convertStringToHexCode(String data);
 
-    byte[] readHexFile(String filePath) throws IOException;
+    byte[] readHexFile();
 
     void printHexDump(byte[] data);
 
