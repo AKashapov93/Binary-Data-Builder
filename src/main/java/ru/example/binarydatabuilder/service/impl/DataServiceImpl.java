@@ -21,12 +21,13 @@ import static ru.example.binarydatabuilder.utils.Constant.*;
 @Service
 @RequiredArgsConstructor
 public class DataServiceImpl implements DataService {
-    public static final String FILE_PATH = "C://Aleksandr//Binary-Data-Builder//src//main//resources//хуета.580";
-
+    public static final String FILE_PATH = "C://Aleksandr//Binary-Data-Builder//src//main//resources//Александр.580";
+    //Создавай каждый раз чистый файл иначе будут ошибки!!!!
     private final DataTableRepository dataTableRepository;
+    private int counter = 0;
 
     @Override
-    public void createTableAndWriteToFile(final DataRequest dataRequest)  {
+    public void createTableAndWriteToFile(final DataRequest dataRequest) {
         //  buildTable(dataRequest);
 
         try {
@@ -95,36 +96,52 @@ public class DataServiceImpl implements DataService {
 
         }
     }
-public void  buildFile( final  DataRequest dataRequest) throws IOException {
-    String[] strings = {dataRequest.name(), dataRequest.group(), dataRequest.recordBook()};
-    StringBuilder builder = new StringBuilder();
 
-    for (int i = 0; i < 3; i++) {
-        String[] hexStrings = convertStringToHexCode(strings[i]).split(" ");
-        int b = 39 - strings[i].length();
-        String[] spase = buildWhitespace(b);
-        String[] result = Stream.concat(Arrays.stream(hexStrings), Arrays.stream(spase))
-                .toArray(String[]::new);
-        String color = (i == 0) ? RED_COLOR_COMMAND : ((i == 1) ? GREEN_COLOR_COMMAND : BLUE_COLOR_COMMAND);
-        for (String s :result) {
-            builder.append(color).append(" ").append(COMMAND_TEMPLATE.formatted(s)).append(" ");
+    public void buildFile(final DataRequest dataRequest) throws IOException {
+        String[] strings = {dataRequest.name(), dataRequest.group(), dataRequest.recordBook()};
+        StringBuilder builder = new StringBuilder();
+
+        for (int i = 0; i < 3; i++) {
+            String[] hexStrings = convertStringToHexCode(strings[i]).split(" ");
+            int b = 39 - strings[i].length();
+            String[] spase = buildWhitespace(b);
+            String[] result = Stream.concat(Arrays.stream(hexStrings), Arrays.stream(spase))
+                    .toArray(String[]::new);
+            String[] result1 = new String[result.length - 1];
+            System.arraycopy(result, 0, result1, 0, result1.length);
+            String color = (i == 0) ? RED_COLOR_COMMAND : ((i == 1) ? GREEN_COLOR_COMMAND : BLUE_COLOR_COMMAND);
+            for (String s : result1) {
+                builder.append(color).append(" ").append(COMMAND_TEMPLATE.formatted(s)).append(" ");
+            }
+            builder.append("76");
         }
-        builder.append("76");
+        String result = builder.toString().trim();
+        String result1 = result.replace("\n", " ");
+        String result2 = result1.toUpperCase();
+        System.out.println(result2);
+        byte[] data = readHexFile();
+        editHexValue(data, result2);
+        saveHexFile(data);
     }
-    String result = builder.toString().trim();
-    String result1 = result.replace("\n" , " ");
-    System.out.println(result1);
- byte[] data = readHexFile();
- editHexValue(data, result1);
- saveHexFile(data);
-}
-public String[] buildWhitespace(int i){
-        String[] strings = new String[i];
-    for (int j = 0; j <i ; j++) {
-        strings[j] = "20";
+
+    public String[] buildWhitespace(int i) {
+        String[] strings = new String[i + 1];
+        String[] strings1 = new String[1];
+        counter++;
+        if (counter < 3) {
+
+            for (int j = 0; j < i + 1; j++) {
+                strings[j] = "20";
+            }
+            strings[i] = "0";
+            return strings;
+
+        } else {
+            strings1[0] = "76";
+            return strings1;
+        }
     }
-    return strings;
-}
+
     private void buildTable(final DataRequest dataRequest) {
         String[] strings = {dataRequest.name(), dataRequest.group(), dataRequest.recordBook()};
         IntStream.range(0, strings.length)
