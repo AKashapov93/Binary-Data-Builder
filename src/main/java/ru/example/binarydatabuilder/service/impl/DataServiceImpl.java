@@ -3,6 +3,7 @@ package ru.example.binarydatabuilder.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.example.binarydatabuilder.dto.DataRequest;
+import ru.example.binarydatabuilder.dto.DataResponse;
 import ru.example.binarydatabuilder.entity.DataTable;
 import ru.example.binarydatabuilder.repository.DataTableRepository;
 import ru.example.binarydatabuilder.service.DataService;
@@ -12,7 +13,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -27,16 +30,16 @@ public class DataServiceImpl implements DataService {
     private int counter = 0;
 
     @Override
-    public void createTableAndWriteToFile(final DataRequest dataRequest) {
-        //  buildTable(dataRequest);
+    public DataResponse createTableAndWriteToFile(final DataRequest dataRequest) {
 
         try {
             buildFile(dataRequest);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
 
+        return buildTable(dataRequest);
+    }
 
     @Override
     public String convertStringToHexCode(String data) {
@@ -142,39 +145,51 @@ public class DataServiceImpl implements DataService {
         }
     }
 
-    private void buildTable(final DataRequest dataRequest) {
+    private DataResponse buildTable(final DataRequest dataRequest) {
         String[] strings = {dataRequest.name(), dataRequest.group(), dataRequest.recordBook()};
+        List<String> lines = new ArrayList<>();
         IntStream.range(0, strings.length)
                 .forEach(index -> {
-                    String[] hexStrings = convertStringToHexCode(strings[index]).split(" ");
+                    String currentLine = strings[index].trim();
+                    lines.add(String.valueOf(39 - currentLine.length()));
+                    String[] hexStrings = convertStringToHexCode(currentLine).split(" ");
                     Arrays.stream(hexStrings)
                             .forEach(hexString -> {
                                 DataTable colorDataTable = chooseDataTableColor(index);
                                 dataTableRepository.save(colorDataTable);
-                                dataTableRepository.save(new DataTable(
-                                        COMMAND_TEMPLATE.formatted(hexString),
+                                dataTableRepository.save(new DataTable(null,
+                                        COMMAND_TEMPLATE.formatted(hexString.toUpperCase()),
                                         MNEMONIC_AND_OPERAND_TEMPLATE.formatted(hexString),
-                                        COMMENT_TEMPLATE.formatted(
+                                        hexString.equals("20") ? COMMENT_SPACE : COMMENT_TEMPLATE.formatted(
                                                 hexString,
                                                 hexString,
-                                                hexString.equals("20") ? COMMENT_SPACE : convertHexCodeToString(hexString),
+                                                convertHexCodeToString(hexString),
                                                 hexString
                                         )));
 
                             });
+                    if (index != strings.length - 1) {
+                        IntStream.range(currentLine.length(), 39).forEach(value -> {
+                            dataTableRepository.save(new DataTable(null, null, null, null));
+                            dataTableRepository.save(new DataTable(null, null, null, null));
+                        });
+                    } else {
+                        dataTableRepository.save(new DataTable("not empty", "76", "HLT", "Остановка процессора"));
+                    }
                 });
+        return new DataResponse(lines.get(0), lines.get(1), lines.get(2));
     }
 
     public DataTable chooseDataTableColor(int index) {
         switch (index) {
             case (0) -> {
-                return new DataTable(RED_COLOR_COMMAND, MNEMONIC_AND_OPERAND_RED, COMMENT_RED);
+                return new DataTable(null, RED_COLOR_COMMAND, MNEMONIC_AND_OPERAND_RED, COMMENT_RED);
             }
             case (1) -> {
-                return new DataTable(GREEN_COLOR_COMMAND, MNEMONIC_AND_OPERAND_GREEN, COMMENT_GREEN);
+                return new DataTable(null, GREEN_COLOR_COMMAND, MNEMONIC_AND_OPERAND_GREEN, COMMENT_GREEN);
             }
             case (2) -> {
-                return new DataTable(BLUE_COLOR_COMMAND, MNEMONIC_AND_OPERAND_BLUE, COMMENT_BLUE);
+                return new DataTable(null, BLUE_COLOR_COMMAND, MNEMONIC_AND_OPERAND_BLUE, COMMENT_BLUE);
             }
         }
         return null;
