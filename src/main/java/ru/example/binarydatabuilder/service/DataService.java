@@ -17,5 +17,5 @@ public interface DataService {
 
     void editHexValue(byte[] data, String newValueHex);
 
-    void saveHexFile(String filePath, byte[] data) throws IOException;
+    void saveHexFile(byte[] data) throws IOException;
 }
