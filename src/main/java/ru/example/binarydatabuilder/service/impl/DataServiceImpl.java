@@ -159,12 +159,12 @@ public class DataServiceImpl implements DataService {
                                 dataTableRepository.save(colorDataTable);
                                 dataTableRepository.save(new DataTable(null,
                                         COMMAND_TEMPLATE.formatted(hexString.toUpperCase()),
-                                        MNEMONIC_AND_OPERAND_TEMPLATE.formatted(hexString),
+                                        MNEMONIC_AND_OPERAND_TEMPLATE.formatted(hexString.toUpperCase()),
                                         hexString.equals("20") ? COMMENT_SPACE : COMMENT_TEMPLATE.formatted(
-                                                hexString,
-                                                hexString,
+                                                hexString.toUpperCase(),
+                                                hexString.toUpperCase(),
                                                 convertHexCodeToString(hexString),
-                                                hexString
+                                                hexString.toUpperCase()
                                         )));
 
                             });
