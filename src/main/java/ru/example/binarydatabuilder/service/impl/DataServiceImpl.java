@@ -39,11 +39,11 @@ public class DataServiceImpl implements DataService {
     @Override
     public String createTableAndWriteToFile(final DataRequest dataRequest) {
 
-//        try {
-//            buildFile(dataRequest);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
+        try {
+            buildFile(dataRequest);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         return buildTable(dataRequest);
     }
