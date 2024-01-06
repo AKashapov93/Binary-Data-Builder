@@ -1,9 +1,12 @@
 package ru.example.binarydatabuilder.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.xwpf.usermodel.*;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTcPr;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.STMerge;
 import org.springframework.stereotype.Service;
 import ru.example.binarydatabuilder.dto.DataRequest;
-import ru.example.binarydatabuilder.dto.DataResponse;
+import ru.example.binarydatabuilder.dto.NumberOfSpaces;
 import ru.example.binarydatabuilder.entity.DataTable;
 import ru.example.binarydatabuilder.repository.DataTableRepository;
 import ru.example.binarydatabuilder.service.DataService;
@@ -19,18 +22,22 @@ import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static ru.example.binarydatabuilder.utils.Constant.*;
 
 @Service
 @RequiredArgsConstructor
 public class DataServiceImpl implements DataService {
+
     public static final String FILE_PATH = "C://Aleksandr//Binary-Data-Builder//src//main//resources//Александр.580";
+
     //Создавай каждый раз чистый файл иначе будут ошибки!!!!
     private final DataTableRepository dataTableRepository;
     private int counter = 0;
 
     @Override
-    public DataResponse createTableAndWriteToFile(final DataRequest dataRequest) {
+    public String createTableAndWriteToFile(final DataRequest dataRequest) {
 
         try {
             buildFile(dataRequest);
@@ -145,7 +152,7 @@ public class DataServiceImpl implements DataService {
         }
     }
 
-    private DataResponse buildTable(final DataRequest dataRequest) {
+    private String buildTable(final DataRequest dataRequest) {
         String[] strings = {dataRequest.name(), dataRequest.group(), dataRequest.recordBook()};
         List<String> lines = new ArrayList<>();
         IntStream.range(0, strings.length)
@@ -177,7 +184,8 @@ public class DataServiceImpl implements DataService {
                         dataTableRepository.save(new DataTable("not empty", "76", "HLT", "Остановка процессора"));
                     }
                 });
-        return new DataResponse(lines.get(0), lines.get(1), lines.get(2));
+        NumberOfSpaces numberOfSpaces = new NumberOfSpaces(lines.get(0), lines.get(1));
+        return createWordDocument(numberOfSpaces, dataRequest.name().trim().replace(" ", "_"));
     }
 
     public DataTable chooseDataTableColor(int index) {
@@ -205,5 +213,90 @@ public class DataServiceImpl implements DataService {
         }
 
         return new String(bytes, Charset.forName("CP866"));
+    }
+
+    private String createWordDocument(NumberOfSpaces numberOfSpaces, String fileName) {
+        String fullWordFilePath = WORD_FILE_PATH + fileName + ".docx";
+        try (FileOutputStream fos = new FileOutputStream(fullWordFilePath);
+             XWPFDocument document = new XWPFDocument()) {
+
+            XWPFTable table = document.createTable();
+            table.setWidth(8052);
+            table.setWidthType(TableWidthType.DXA);
+
+            List<DataTable> data = dataTableRepository.findAll();
+
+            table.removeRow(0);
+            XWPFTableRow headerRow = table.createRow();
+            for (int i = 0; i < COLUMN_NAMES.length; i++) {
+                String columnName = COLUMN_NAMES[i];
+                XWPFTableCell cell = headerRow.getCell(i);
+                if (cell == null) {
+                    cell = headerRow.createCell();
+                }
+                cell.setText(columnName);
+                cell.setWidth(COLUMN_WIDTHS[i]);
+                cell.setWidthType(TableWidthType.DXA);
+                cell.setVerticalAlignment(XWPFTableCell.XWPFVertAlign.CENTER);
+            }
+
+            boolean skipRows = false;
+            int countLine = 0;
+
+            for (DataTable row : data) {
+                if (row.getCommand() == null && row.getMnemonicAndOperand() == null && row.getComment() == null) {
+                    if (!skipRows) {
+                        XWPFTableRow tableRow = table.createRow();
+                        for (int i = 0; i < 5; i++) {
+                            CTTcPr tcPr = tableRow.getCell(i).getCTTc().addNewTcPr();
+                            if (i == 0) {
+                                tcPr.addNewHMerge().setVal(STMerge.RESTART);
+                            } else {
+                                tcPr.addNewHMerge().setVal(STMerge.CONTINUE);
+                            }
+                        }
+                        XWPFTableCell cell = tableRow.getCell(0);
+                        cell.setText(String.format(REPLACE_SPACES,
+                                countLine == 0 ? numberOfSpaces.firstLine()
+                                        : numberOfSpaces.secondLine()));
+                        skipRows = true;
+                        countLine++;
+                    }
+                } else {
+                    if (skipRows) skipRows = false;
+                    XWPFTableRow tableRow = table.createRow();
+                    processCellWithLineBreaks(tableRow.getCell(0), row.getAddress());
+                    processCellWithLineBreaks(tableRow.getCell(1), row.getCommand());
+                    processCellWithLineBreaks(tableRow.getCell(3), row.getMnemonicAndOperand());
+                    processCellWithLineBreaks(tableRow.getCell(4), row.getComment());
+                }
+
+            }
+
+            for (XWPFTableRow tableRow : table.getRows()) {
+                if (nonNull(tableRow.getCell(1))) {
+                    XWPFTableCell cell = tableRow.getCell(1);
+                    cell.getParagraphs().forEach(paragraph -> paragraph.setAlignment(ParagraphAlignment.CENTER));
+                }
+            }
+
+            document.write(fos);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return fullWordFilePath;
+    }
+
+    private void processCellWithLineBreaks(XWPFTableCell cell, String content) {
+        if (isNull(content)) return;
+        String[] lines = content.split("\n");
+        XWPFParagraph paragraph = cell.addParagraph();
+        for (String line : lines) {
+            XWPFRun run = paragraph.createRun();
+            run.setFontFamily("Arimo");
+            run.setFontSize(10);
+            run.setText(line);
+            run.addBreak();
+        }
     }
 }

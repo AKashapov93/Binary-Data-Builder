@@ -1,21 +1,27 @@
 package ru.example.binarydatabuilder.utils;
 
+import java.io.File;
+
 public class Constant {
 
+    public static final String REPLACE_SPACES = "%s символа пробел для заполнения строки в 39 символов";
+    public static final String WORD_FILE_PATH = System.getProperty("user.dir") + File.separator;
+    public static final String[] COLUMN_NAMES = {"адрес", "код команды", "метка", "мнемоника и операнд", "комментарии"};
+    public static final String[] COLUMN_WIDTHS = {"763", "1037", "750", "1274", "4172"};
     public static final String RED_COLOR_COMMAND =
             """
                     3E
                     56
                     D3
                     00
-                    """;
+                            """;
     public static final String GREEN_COLOR_COMMAND =
             """
                     3E
                     26
                     D3
                     00
-                    """;
+                            """;
 
     public static final String BLUE_COLOR_COMMAND =
             """
@@ -23,7 +29,7 @@ public class Constant {
                     46
                     D3
                     00
-                    """;
+                            """;
 
     public static final String COMMAND_TEMPLATE =
             """
@@ -95,7 +101,6 @@ public class Constant {
                     {номер символа в Акк, пробел ->A}
                     A->PORT 00,PORT 00= 20
                     {номер символа в порт монитора
-
                                                       """;
 
     public static final String COMMENT_TEMPLATE =
@@ -104,7 +109,6 @@ public class Constant {
                     {номер символа в Акк, %s ->A}
                     A->PORT 00,PORT 00= %s
                     {номер символа в порт монитора}
-
                                                       """;
 
     private Constant() {
