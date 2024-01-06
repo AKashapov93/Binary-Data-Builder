@@ -4,8 +4,12 @@ import java.io.File;
 
 public class Constant {
 
+    public static final String TIMES_NEW_ROMAN = "Times New Roman";
+    public static final String PARAGRAF_1 = "Практическая работа";
+    public static final String PARAGRAF_2 = "Вывод текстовой информации на экран эмулятора микропроцессора К580";
+    public static final String PARAGRAF_3 = "Листинг программы";
     public static final String REPLACE_SPACES = "%s символа пробел для заполнения строки в 39 символов";
-    public static final String WORD_FILE_PATH = System.getProperty("user.dir") + File.separator;
+    public static final String ROOT_PROJECT_PATH = System.getProperty("user.dir") + File.separator;
     public static final String[] COLUMN_NAMES = {"адрес", "код команды", "метка", "мнемоника и операнд", "комментарии"};
     public static final String[] COLUMN_WIDTHS = {"763", "1037", "750", "1274", "4172"};
     public static final String RED_COLOR_COMMAND =

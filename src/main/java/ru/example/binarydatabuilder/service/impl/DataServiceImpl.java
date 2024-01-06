@@ -39,11 +39,11 @@ public class DataServiceImpl implements DataService {
     @Override
     public String createTableAndWriteToFile(final DataRequest dataRequest) {
 
-        try {
-            buildFile(dataRequest);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+//            buildFile(dataRequest);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
 
         return buildTable(dataRequest);
     }
@@ -216,9 +216,13 @@ public class DataServiceImpl implements DataService {
     }
 
     private String createWordDocument(NumberOfSpaces numberOfSpaces, String fileName) {
-        String fullWordFilePath = WORD_FILE_PATH + fileName + ".docx";
+        String fullWordFilePath = ROOT_PROJECT_PATH + fileName + ".docx";
         try (FileOutputStream fos = new FileOutputStream(fullWordFilePath);
              XWPFDocument document = new XWPFDocument()) {
+
+            createStyledParagraph(document, PARAGRAF_1, true, ParagraphAlignment.CENTER);
+            createStyledParagraph(document, PARAGRAF_2, true, ParagraphAlignment.CENTER);
+            createStyledParagraph(document, PARAGRAF_3, false, ParagraphAlignment.LEFT);
 
             XWPFTable table = document.createTable();
             table.setWidth(8052);
@@ -298,5 +302,15 @@ public class DataServiceImpl implements DataService {
             run.setText(line);
             run.addBreak();
         }
+    }
+
+    private void createStyledParagraph(XWPFDocument document, String text, boolean isBold, ParagraphAlignment alignment) {
+        XWPFParagraph paragraph = document.createParagraph();
+        paragraph.setAlignment(alignment);
+        XWPFRun run = paragraph.createRun();
+        run.setFontFamily(TIMES_NEW_ROMAN);
+        run.setFontSize(14);
+        run.setBold(isBold);
+        run.setText(text);
     }
 }
