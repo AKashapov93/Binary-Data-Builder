@@ -52,4 +52,8 @@ public class DataTable {
         }
         return hexString.toString();
     }
+
+    public static void resetCounter() {
+        counter = 0;
+    }
 }

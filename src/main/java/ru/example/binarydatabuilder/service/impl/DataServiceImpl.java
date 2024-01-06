@@ -45,7 +45,10 @@ public class DataServiceImpl implements DataService {
             throw new RuntimeException(e);
         }
 
-        return buildTable(dataRequest);
+        String pathToFile = buildTable(dataRequest);
+        dataTableRepository.deleteAll();
+        DataTable.resetCounter();
+        return pathToFile;
     }
 
     @Override
