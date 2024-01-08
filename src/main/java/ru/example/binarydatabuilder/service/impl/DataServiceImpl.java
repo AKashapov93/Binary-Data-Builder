@@ -135,6 +135,7 @@ public class DataServiceImpl implements DataService {
         byte[] data = readHexFile();
         editHexValue(data, result2);
         saveHexFile(data);
+        counter = 0;
     }
 
     public String[] buildWhitespace(int i) {
