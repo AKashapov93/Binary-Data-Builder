@@ -11,10 +11,7 @@ import ru.example.binarydatabuilder.entity.DataTable;
 import ru.example.binarydatabuilder.repository.DataTableRepository;
 import ru.example.binarydatabuilder.service.DataService;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +27,7 @@ import static ru.example.binarydatabuilder.utils.Constant.*;
 @RequiredArgsConstructor
 public class DataServiceImpl implements DataService {
 
-    public static final String FILE_PATH = "C://Aleksandr//Binary-Data-Builder//src//main//resources//Александр.580";
+    public static final String FILE_PATH = System.getProperty("user.dir") + File.separator + "UserTest.580";
 
     //Создавай каждый раз чистый файл иначе будут ошибки!!!!
     private final DataTableRepository dataTableRepository;
