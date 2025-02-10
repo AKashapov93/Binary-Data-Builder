@@ -7,3 +7,7 @@ spring:
 
   liquibase:
     change-log: "db.changelog/db.changelog.yml"
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop

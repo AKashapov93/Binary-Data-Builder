@@ -18,8 +18,7 @@ public class DataController {
 
     @PostMapping("/data")
     public ResponseEntity<String> acceptData(@RequestBody DataRequest dataRequest) {
-        dataService.createTableAndWriteToFile(dataRequest);
-        return ResponseEntity.ok("Success");
+        return ResponseEntity.ok(dataService.createTableAndWriteToFile(dataRequest));
     }
 
     @GetMapping("/data")

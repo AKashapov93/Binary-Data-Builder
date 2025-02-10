@@ -1,18 +1,7 @@
 package ru.example.binarydatabuilder.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Getter
@@ -47,12 +36,12 @@ public class DataTable {
     @Column(name = "comment")
     private String comment;
 
-    public DataTable(String command, String mnemonicAndOperand, String comment) {
+    public DataTable(String address, String command, String mnemonicAndOperand, String comment) {
         this.command = command;
         this.mnemonicAndOperand = mnemonicAndOperand;
         this.comment = comment;
         this.marker = null;
-        this.address = generateHexValue();
+        this.address = address == null ? generateHexValue() : generateHexValue().split("\n")[0];
     }
 
     private String generateHexValue() {
@@ -62,5 +51,9 @@ public class DataTable {
             hexString.append("\n");
         }
         return hexString.toString();
+    }
+
+    public static void resetCounter() {
+        counter = 0;
     }
 }
